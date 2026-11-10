@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Crédito #{{ credito.id }} — FinanTech{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>Solicitud #{{ credito.id }} — {{ credito.cliente.nombre }}</h1>
+    <div class="subtitle">{{ 'Proceso de originación de crédito — capa de Negocio' if current_user.es_analista else 'Estado de tu solicitud' }}</div>
+  </div>
+  <span class="badge badge-{{ credito.estado|replace(' ', '-') }}" style="font-size:0.9rem; padding:0.4rem 0.9rem;">{{ credito.estado }}</span>
+</div>
+
+<div class="card">
+  <div class="stepper">
+    {% for paso in pasos %}
+      {% set idx = loop.index0 %}
+      {% set is_rejected = credito.estado == 'Rechazado' and idx == 1 %}
+      <div class="step {% if is_rejected %}rejected{% elif idx < credito.paso_actual %}done{% elif idx == credito.paso_actual %}current{% endif %}">
+        <div class="dot">
+          {% if is_rejected %}&#10005;{% elif idx < credito.paso_actual %}&#10003;{% else %}{{ idx + 1 }}{% endif %}
+        </div>
+        <div class="label">{{ paso }}</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="form-row" style="margin-top:1.5rem; align-items:start;">
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Datos de la solicitud</div>
+    <table class="data-table">
+      <tbody>
+        <tr><td class="muted">Cliente</td><td>{% if current_user.es_analista %}<a href="{{ url_for('detalle_cliente', cliente_id=credito.cliente.id) }}">{{ credito.cliente.nombre }}</a>{% else %}{{ credito.cliente.nombre }}{% endif %}</td></tr>
+        <tr><td class="muted">Monto</td><td>${{ "{:,.0f}".format(credito.monto) }}</td></tr>
+        <tr><td class="muted">Plazo</td><td>{{ credito.plazo_meses }} meses</td></tr>
+        <tr><td class="muted">Propósito</td><td>{{ credito.proposito or "No especificado" }}</td></tr>
+        {% if credito.score_evaluacion and current_user.es_analista %}
+        <tr><td class="muted">Score de evaluación</td><td>{{ credito.score_evaluacion }}</td></tr>
+        {% endif %}
+        {% if credito.tasa_interes %}
+        <tr><td class="muted">Tasa de interés (E.A.)</td><td>{{ "%.1f"|format(credito.tasa_interes) }}%</td></tr>
+        <tr><td class="muted">Cuota mensual estimada</td><td>${{ "{:,.0f}".format(credito.cuota_mensual) }}</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <div style="margin-top:1.3rem; display:flex; gap:0.6rem;">
+      {% if current_user.es_analista and credito.estado == "Solicitado" %}
+        <form method="post" action="{{ url_for('evaluar', credito_id=credito.id) }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-cyan">Enviar a evaluación de riesgo</button>
+        </form>
+      {% elif current_user.es_analista and credito.estado == "Aprobado" %}
+        <form method="post" action="{{ url_for('desembolsar', credito_id=credito.id) }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-green">Confirmar desembolso</button>
+        </form>
+      {% endif %}
+      <a href="{{ url_for('lista_creditos' if current_user.es_analista else 'mi_panel') }}" class="btn btn-outline">{{ 'Volver al listado' if current_user.es_analista else 'Volver a mi panel' }}</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Trazabilidad del proceso</div>
+    {% if movimientos %}
+      <ul class="timeline">
+        {% for m in movimientos|sort(attribute='fecha', reverse=true) %}
+          <li>
+            {{ m.descripcion }}
+            <span class="time">{{ m.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty-state">Sin movimientos aún.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

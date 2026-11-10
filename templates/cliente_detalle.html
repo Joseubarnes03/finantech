@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ cliente.nombre }} — FinanTech{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>{{ cliente.nombre }}</h1>
+    <div class="subtitle">Vista 360° — la misma información que ven Créditos, Contabilidad, Web y App</div>
+  </div>
+  <a href="{{ url_for('nuevo_credito', cliente_id=cliente.id) }}" class="btn btn-cyan">+ Solicitar crédito</a>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi">
+    <div class="label">Identificación</div>
+    <div class="value" style="font-size:1.1rem;">{{ cliente.identificacion }}</div>
+  </div>
+  <div class="kpi accent-cyan">
+    <div class="label">Score crediticio</div>
+    <div class="value">{{ cliente.score }}</div>
+  </div>
+  <div class="kpi accent-green">
+    <div class="label">Ingresos mensuales</div>
+    <div class="value" style="font-size:1.2rem;">${{ "{:,.0f}".format(cliente.ingresos_mensuales) }}</div>
+  </div>
+  <div class="kpi accent-amber">
+    <div class="label">Deuda activa</div>
+    <div class="value" style="font-size:1.2rem;">${{ "{:,.0f}".format(cliente.deuda_total) }}</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title" style="margin-top:0;">Contacto</div>
+  <p class="muted" style="margin:0;">{{ cliente.email }} &nbsp;·&nbsp; {{ cliente.telefono or "sin teléfono registrado" }}</p>
+</div>
+
+<div class="section-title">Historial de créditos</div>
+<div class="card">
+  {% if cliente.creditos %}
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Monto</th><th>Plazo</th><th>Estado</th><th>Fecha solicitud</th><th></th></tr></thead>
+      <tbody>
+        {% for cr in cliente.creditos|sort(attribute='fecha_solicitud', reverse=true) %}
+          <tr>
+            <td>#{{ cr.id }}</td>
+            <td>${{ "{:,.0f}".format(cr.monto) }}</td>
+            <td>{{ cr.plazo_meses }} meses</td>
+            <td><span class="badge badge-{{ cr.estado|replace(' ', '-') }}">{{ cr.estado }}</span></td>
+            <td>{{ cr.fecha_solicitud.strftime('%d/%m/%Y') }}</td>
+            <td><a href="{{ url_for('detalle_credito', credito_id=cr.id) }}" class="btn btn-outline btn-sm">Ver</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state">Este cliente aún no tiene solicitudes de crédito.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

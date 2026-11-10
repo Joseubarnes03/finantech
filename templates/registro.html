@@ -1,0 +1,46 @@
+{% extends "auth_base.html" %}
+{% block title %}Crear cuenta — FinanTech{% endblock %}
+{% block content %}
+<h1>Crear cuenta de cliente</h1>
+<p class="muted" style="margin-top:0;">Si ya eres cliente de FinanTech, usa el mismo correo con el que te registraron y tu cuenta se enlazará a tu historial.</p>
+
+<form method="post">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <div class="form-group">
+    <label>Nombre completo</label>
+    <input type="text" name="nombre" value="{{ form.get('nombre','') }}" required>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Identificación</label>
+      <input type="text" name="identificacion" value="{{ form.get('identificacion','') }}" required>
+    </div>
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input type="text" name="telefono" value="{{ form.get('telefono','') }}">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input type="email" name="email" value="{{ form.get('email','') }}" required>
+    </div>
+    <div class="form-group">
+      <label>Ingresos mensuales (COP)</label>
+      <input type="number" name="ingresos_mensuales" min="0" step="100000" value="{{ form.get('ingresos_mensuales','') }}" required>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Contraseña (mín. 8 caracteres)</label>
+      <input type="password" name="password" minlength="8" required>
+    </div>
+    <div class="form-group">
+      <label>Repite la contraseña</label>
+      <input type="password" name="password2" minlength="8" required>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Crear cuenta</button>
+</form>
+<p class="auth-alt">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+{% endblock %}

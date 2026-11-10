@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FinanTech{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">FinanTech</div>
+      <span class="brand-sub">{{ 'Portal de gestión' if current_user.es_analista else 'Portal del cliente' }}</span>
+      <nav>
+        {% if current_user.es_analista %}
+          <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}"><span class="icon">&#9679;</span> Dashboard</a>
+          <a href="{{ url_for('lista_clientes') }}" class="{{ 'active' if request.endpoint in ['lista_clientes','detalle_cliente','nuevo_cliente'] }}"><span class="icon">&#9679;</span> Clientes</a>
+          <a href="{{ url_for('lista_creditos') }}" class="{{ 'active' if request.endpoint in ['lista_creditos','detalle_credito','nuevo_credito'] }}"><span class="icon">&#9679;</span> Créditos</a>
+          <a href="{{ url_for('api_dashboard') }}" target="_blank"><span class="icon">&#9679;</span> API / JSON</a>
+        {% else %}
+          <a href="{{ url_for('mi_panel') }}" class="{{ 'active' if request.endpoint in ['mi_panel','detalle_credito'] }}"><span class="icon">&#9679;</span> Mi panel</a>
+          <a href="{{ url_for('nuevo_credito') }}" class="{{ 'active' if request.endpoint == 'nuevo_credito' }}"><span class="icon">&#9679;</span> Solicitar crédito</a>
+        {% endif %}
+      </nav>
+
+      <div class="user-box">
+        <div class="user-name">{{ current_user.nombre }}</div>
+        <span class="role-chip role-{{ current_user.rol }}">{{ 'Analista' if current_user.es_analista else 'Cliente' }}</span>
+        <form method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-logout">Cerrar sesión</button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

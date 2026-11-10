@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Nuevo cliente — FinanTech{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>Nuevo cliente</h1>
+    <div class="subtitle">Se crea una sola vez en el repositorio MDM y lo comparten todos los módulos</div>
+  </div>
+</div>
+
+<div class="card" style="max-width:640px;">
+  <form method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Identificación</label>
+        <input type="text" name="identificacion" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="text" name="telefono">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Ingresos mensuales (COP)</label>
+        <input type="number" name="ingresos_mensuales" min="0" step="100000" required>
+      </div>
+      <div class="form-group">
+        <label>Score crediticio inicial</label>
+        <input type="number" name="score" min="300" max="900" value="650" required>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar cliente</button>
+    <a href="{{ url_for('lista_clientes') }}" class="btn btn-outline">Cancelar</a>
+  </form>
+</div>
+
+{% endblock %}

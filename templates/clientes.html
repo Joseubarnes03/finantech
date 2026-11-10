@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Clientes — FinanTech{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>Clientes</h1>
+    <div class="subtitle">Repositorio único de identidad (MDM) — misma información en cualquier canal</div>
+  </div>
+  <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-cyan">+ Nuevo cliente</a>
+</div>
+
+<form method="get" class="card" style="margin-bottom:1.5rem; display:flex; gap:0.8rem; align-items:end;">
+  <div class="form-group" style="flex:1; margin-bottom:0;">
+    <label>Buscar por nombre o identificación</label>
+    <input type="text" name="q" value="{{ q }}" placeholder="Ej: Ana Torres o 1023456789">
+  </div>
+  <button class="btn btn-outline" type="submit">Buscar</button>
+</form>
+
+<div class="card">
+  {% if clientes %}
+    <table class="data-table">
+      <thead>
+        <tr><th>Nombre</th><th>Identificación</th><th>Score</th><th>Créditos</th><th>Deuda activa</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for c in clientes %}
+          <tr>
+            <td>{{ c.nombre }}</td>
+            <td>{{ c.identificacion }}</td>
+            <td>{{ c.score }}</td>
+            <td>{{ c.creditos|length }}</td>
+            <td>${{ "{:,.0f}".format(c.deuda_total) }}</td>
+            <td><a href="{{ url_for('detalle_cliente', cliente_id=c.id) }}" class="btn btn-outline btn-sm">Ver 360°</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state">No se encontraron clientes.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

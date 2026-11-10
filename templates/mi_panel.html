@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Mi panel — FinanTech{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>Hola, {{ cliente.nombre.split(' ')[0] }}</h1>
+    <div class="subtitle">Aquí ves tu información y el estado de tus solicitudes, igual que en cualquier canal de FinanTech</div>
+  </div>
+  <a href="{{ url_for('nuevo_credito') }}" class="btn btn-cyan">+ Solicitar crédito</a>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi accent-cyan"><div class="label">Score crediticio</div><div class="value">{{ cliente.score }}</div></div>
+  <div class="kpi"><div class="label">Ingresos declarados</div><div class="value" style="font-size:1.2rem;">${{ "{:,.0f}".format(cliente.ingresos_mensuales) }}</div></div>
+  <div class="kpi accent-amber"><div class="label">Deuda activa</div><div class="value" style="font-size:1.2rem;">${{ "{:,.0f}".format(cliente.deuda_total) }}</div></div>
+  <div class="kpi accent-green"><div class="label">Mis solicitudes</div><div class="value">{{ creditos|length }}</div></div>
+</div>
+
+<div class="section-title">Mis créditos</div>
+<div class="card">
+  {% if creditos %}
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Monto</th><th>Plazo</th><th>Estado</th><th>Solicitado</th><th></th></tr></thead>
+      <tbody>
+        {% for cr in creditos %}
+          <tr>
+            <td>#{{ cr.id }}</td>
+            <td>${{ "{:,.0f}".format(cr.monto) }}</td>
+            <td>{{ cr.plazo_meses }} meses</td>
+            <td><span class="badge badge-{{ cr.estado|replace(' ', '-') }}">{{ cr.estado }}</span></td>
+            <td>{{ cr.fecha_solicitud.strftime('%d/%m/%Y') }}</td>
+            <td><a href="{{ url_for('detalle_credito', credito_id=cr.id) }}" class="btn btn-outline btn-sm">Ver estado</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state">Aún no tienes solicitudes. ¡Pide tu primer crédito 100% digital!</p>
+  {% endif %}
+</div>
+{% endblock %}

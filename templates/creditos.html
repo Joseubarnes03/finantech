@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Créditos — FinanTech{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>Créditos</h1>
+    <div class="subtitle">Proceso integrado: Solicitud → Evaluación → Aprobación → Desembolso</div>
+  </div>
+  <a href="{{ url_for('nuevo_credito') }}" class="btn btn-cyan">+ Nueva solicitud</a>
+</div>
+
+<div class="card" style="margin-bottom:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+  <a href="{{ url_for('lista_creditos') }}" class="btn btn-sm {{ 'btn-primary' if not estado_actual else 'btn-outline' }}">Todos</a>
+  {% for e in estados %}
+    <a href="{{ url_for('lista_creditos', estado=e) }}" class="btn btn-sm {{ 'btn-primary' if estado_actual == e else 'btn-outline' }}">{{ e }}</a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  {% if creditos %}
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Cliente</th><th>Monto</th><th>Plazo</th><th>Estado</th><th>Solicitado</th><th></th></tr></thead>
+      <tbody>
+        {% for cr in creditos %}
+          <tr>
+            <td>#{{ cr.id }}</td>
+            <td>{{ cr.cliente.nombre }}</td>
+            <td>${{ "{:,.0f}".format(cr.monto) }}</td>
+            <td>{{ cr.plazo_meses }} meses</td>
+            <td><span class="badge badge-{{ cr.estado|replace(' ', '-') }}">{{ cr.estado }}</span></td>
+            <td>{{ cr.fecha_solicitud.strftime('%d/%m/%Y') }}</td>
+            <td><a href="{{ url_for('detalle_credito', credito_id=cr.id) }}" class="btn btn-outline btn-sm">Gestionar</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state">No hay solicitudes en este estado.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

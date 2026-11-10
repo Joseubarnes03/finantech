@@ -1,0 +1,27 @@
+{% extends "auth_base.html" %}
+{% block title %}Iniciar sesión — FinanTech{% endblock %}
+{% block content %}
+<h1>Iniciar sesión</h1>
+<p class="muted" style="margin-top:0;">Accede como cliente o como personal de FinanTech; verás solo lo que corresponde a tu perfil.</p>
+
+<form method="post" autocomplete="on">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <div class="form-group">
+    <label>Correo electrónico</label>
+    <input type="email" name="email" required autofocus>
+  </div>
+  <div class="form-group">
+    <label>Contraseña</label>
+    <input type="password" name="password" required>
+  </div>
+  <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Entrar</button>
+</form>
+
+<p class="auth-alt">¿Eres cliente y aún no tienes cuenta? <a href="{{ url_for('registro') }}">Regístrate</a></p>
+
+<div class="demo-box">
+  <strong>Cuentas de demostración</strong>
+  <div>Analista: <code>analista@finantech.com</code> / <code>Analista123</code></div>
+  <div>Cliente: <code>ana.torres@mail.com</code> / <code>Cliente123</code></div>
+</div>
+{% endblock %}

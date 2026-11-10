@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — FinanTech{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>Dashboard</h1>
+    <div class="subtitle">Vista consolidada — un solo cliente, una sola verdad, múltiples canales</div>
+  </div>
+  <a href="{{ url_for('nuevo_credito') }}" class="btn btn-cyan">+ Nueva solicitud de crédito</a>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi">
+    <div class="label">Clientes registrados</div>
+    <div class="value">{{ total_clientes }}</div>
+  </div>
+  <div class="kpi accent-cyan">
+    <div class="label">Solicitudes totales</div>
+    <div class="value">{{ total_creditos }}</div>
+  </div>
+  <div class="kpi accent-green">
+    <div class="label">Total desembolsado</div>
+    <div class="value">${{ "{:,.0f}".format(total_desembolsado) }}</div>
+  </div>
+  <div class="kpi accent-amber">
+    <div class="label">Pendientes por evaluar</div>
+    <div class="value">{{ pendientes|length }}</div>
+  </div>
+</div>
+
+<div class="form-row" style="align-items:start;">
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Solicitudes pendientes</div>
+    {% if pendientes %}
+      <table class="data-table">
+        <thead><tr><th>Cliente</th><th>Monto</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+        {% for c in pendientes %}
+          <tr>
+            <td>{{ c.cliente.nombre }}</td>
+            <td>${{ "{:,.0f}".format(c.monto) }}</td>
+            <td><span class="badge badge-{{ c.estado|replace(' ', '-') }}">{{ c.estado }}</span></td>
+            <td><a href="{{ url_for('detalle_credito', credito_id=c.id) }}" class="btn btn-outline btn-sm">Gestionar</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-state">No hay solicitudes pendientes por evaluar.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Actividad reciente</div>
+    {% if ultimos_movimientos %}
+      <ul class="timeline">
+        {% for m in ultimos_movimientos %}
+          <li>
+            {{ m.descripcion }}
+            <span class="time">Crédito #{{ m.credito_id }} · {{ m.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty-state">Aún no hay movimientos registrados.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
